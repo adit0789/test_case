@@ -1,0 +1,279 @@
+----Database Schema Design----
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_categories
+(
+    cat_id character varying(10) NOT NULL,
+    cat_name character varying(50) NOT NULL,
+    CONSTRAINT tb_categories_pkey PRIMARY KEY (cat_id)
+);
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_customer
+(
+    nik bigint NOT NULL,
+    name character varying(100) NOT NULL,
+    email character varying NOT NULL,
+    no_hp bigint NOT NULL,
+    gender character varying(2) NOT NULL,
+    age bigint NOT NULL,
+    dob date NOT NULL,
+    pob character varying(50) NOT NULL,
+    CONSTRAINT tb_customer_pkey PRIMARY KEY (email)
+);
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_invent
+(
+    invent_id character varying(25) NOT NULL,
+    prd_id character varying(25) NOT NULL,
+    cat_id character varying(25) NOT NULL,
+    qty integer NOT NULL,
+    last_updated timestamp with time zone,
+    status character varying(50) NOT NULL,
+    PRIMARY KEY (invent_id)
+);
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_order_items
+(
+    orderitems_id character varying(25) NOT NULL,
+    order_id character varying(10) NOT NULL,
+    prd_id character varying(10) NOT NULL,
+    qty integer NOT NULL,
+    total_amount numeric(10, 2) NOT NULL,
+    CONSTRAINT "tb_orderItems_pkey" PRIMARY KEY (orderitems_id)
+);
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_orders
+(
+    order_id character varying(10) NOT NULL,
+    order_status character(5) NOT NULL,
+    order_date date NOT NULL,
+    order_time time without time zone NOT NULL,
+    email character varying(50) NOT NULL,
+    CONSTRAINT tb_orders_pkey PRIMARY KEY (order_id)
+);
+
+/*****************************************************/
+CREATE TABLE IF NOT EXISTS sch_ecomm.tb_product
+(
+    prd_id character varying(50) NOT NULL,
+    prd_name character varying(100) NOT NULL,
+    cat_id character varying(10) NOT NULL,
+    price numeric(10, 2) NOT NULL,
+    description character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT tb_product_pkey PRIMARY KEY (prd_id)
+);
+
+/*****************************************************/
+ALTER TABLE IF EXISTS sch_ecomm.tb_invent
+    ADD FOREIGN KEY (prd_id)
+    REFERENCES sch_ecomm.tb_product (prd_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+/*****************************************************/
+ALTER TABLE IF EXISTS sch_ecomm.tb_order_items
+    ADD FOREIGN KEY (prd_id)
+    REFERENCES sch_ecomm.tb_product (prd_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+/*****************************************************/
+ALTER TABLE IF EXISTS sch_ecomm.tb_orders
+    ADD FOREIGN KEY (order_id)
+    REFERENCES sch_ecomm.tb_order_items (order_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+/*****************************************************/
+ALTER TABLE IF EXISTS sch_ecomm.tb_orders
+    ADD FOREIGN KEY (email)
+    REFERENCES sch_ecomm.tb_customer (email) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+/*****************************************************/
+ALTER TABLE IF EXISTS sch_ecomm.tb_product
+    ADD FOREIGN KEY (cat_id)
+    REFERENCES sch_ecomm.tb_categories (cat_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+----SQL Queries----
+----------------------------1.Insert sample data for each tables------------------------
+INSERT INTO sch_ecomm.tb_categories (cat_id,cat_name) values ('C01','ATK');
+INSERT INTO sch_ecomm.tb_categories (cat_id,cat_name) values ('C02','Fashion Male');
+INSERT INTO sch_ecomm.tb_categories (cat_id,cat_name) values ('C03','Fashion Female');
+INSERT INTO sch_ecomm.tb_categories (cat_id,cat_name) values ('C04','Fashion Kids');
+INSERT INTO sch_ecomm.tb_categories (cat_id,cat_name) values ('C05','Pets');
+
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd01','Pensil','C01','5000','Pensil 3b');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd02','Buku','C01','4500','Buku tulis');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd03','Pulpen','C01','3750','Pulpen lower');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd04','Kemeja','C02','150000','Kemeja lengan pendek');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd05','Jam Tangan','C02','275000','Jam oke');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd06','Topi','C02','120000','Topi bulat');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd07','Hijab','C03','60000','Hijab panjang');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd08','Sepatu','C03','400000','Sepatu bola');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd09','Kacamata','C04','150000','Kacamata renang');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd10','Sandal','C04','235000','Sandal gunung');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd11','Vitamin','C05','25000','Vitamin gacor');
+INSERT INTO sch_ecomm.tb_product (prd_id,prd_name,cat_id,price,description) values ('Prd12','Kandang','C05','132000','Kandang besi');
+
+INSERT INTO sch_ecomm.tb_customer (nik,name,email,no_hp,gender,age,dob,pob) values ('111111','Anto','anto@gmail.com','12345678','M','30','1994-01-01','Jakarta');
+INSERT INTO sch_ecomm.tb_customer (nik,name,email,no_hp,gender,age,dob,pob) values ('222222','Rini','rini@yahoo.co.id','87654321','F','17','2007-02-02','Jakarta');
+INSERT INTO sch_ecomm.tb_customer (nik,name,email,no_hp,gender,age,dob,pob) values ('333333','Mike','mike@gmail.com','98765381','M','25','1999-03-03','Jakarta');
+INSERT INTO sch_ecomm.tb_customer (nik,name,email,no_hp,gender,age,dob,pob) values ('444444','Jessica','jes@gmail.com','78167290','F','22','2002-04-04','Jakarta');
+INSERT INTO sch_ecomm.tb_customer (nik,name,email,no_hp,gender,age,dob,pob) values ('555555','Riko','riko@yahoo.com','56178910','M','31','1993-05-05','Jakarta');
+
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent01','Prd01','C01',20,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent02','Prd02','C01',5,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent03','Prd03','C01',10,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent04','Prd04','C02',30,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent05','Prd05','C02',25,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent06','Prd06','C02',50,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent07','Prd07','C03',45,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent08','Prd08','C03',15,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent09','Prd09','C04',30,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent10','Prd10','C04',20,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent11','Prd11','C05',15,'now()','available');
+INSERT INTO sch_ecomm.tb_invent (invent_id,prd_id,cat_id,qty,last_updated,status) values ('invent12','Prd12','C05',50,'now()','available');
+
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord01','ok','2024-01-27','17:05:33','riko@yahoo.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord02','ok','2024-01-29','10:25:20','mike@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord03','ok','2024-02-15','19:15:00','jes@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord04','ok','2024-02-10','22:10:03','rini@yahoo.co.id');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord05','ok','2024-02-20','18:10:20','mike@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord06','ok','2024-03-01','21:20:05','anto@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord07','ok','2024-04-04','18:19:20','riko@yahoo.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord08','ok','2024-05-14','16:17:18','mike@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord09','ok','2024-06-03','08:05:13','jes@gmail.com');
+INSERT INTO sch_ecomm.tb_orders (order_id,order_status,order_date,order_time,email) values ('ord10','ok','2024-06-01','15:55:10','rini@yahoo.co.id');
+
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items01','ord01','Prd01','1','5000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items02','ord01','Prd03','1','3750');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items03','ord01','Prd05','1','275000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items04','ord02','Prd07','2','120000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items05','ord03','Prd09','1','150000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items06','ord03','Prd11','2','50000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items07','ord03','Prd08','1','400000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items08','ord03','Prd07','3','180000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items09','ord04','Prd01','1','5000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items10','ord04','Prd08','4','1600000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items11','ord05','Prd05','2','550000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items12','ord05','Prd03','2','7500');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items13','ord05','Prd08','1','400000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items14','ord05','Prd09','3','450000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items15','ord06','Prd11','3','75000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items16','ord06','Prd08','1','400000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items17','ord07','Prd06','5','600000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items18','ord07','Prd01','3','15000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items19','ord08','Prd02','2','4500');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items20','ord07','Prd10','1','235000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items21','ord09','Prd11','4','100000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items22','ord08','Prd02','3','13500');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items23','ord09','Prd06','2','240000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items24','ord10','Prd12','1','132000');
+INSERT INTO sch_ecomm.tb_order_items (orderitems_id,order_id,prd_id,qty,total_amount) values ('ord_items25','ord10','Prd11','5','125000');
+
+---------2.Retrieve the list of all products along with their categories.------------------------
+select a.prd_id,a.prd_name,a.cat_id,b.cat_name,a.price,a.description
+	from sch_ecomm.tb_product a
+left join sch_ecomm.tb_categories b on a.cat_id=b.cat_id
+
+--------------3.Calculate the total sales amount for each product.-------------------
+select b.prd_name,sum(a.total_amount) as ttl_sales_amount
+	from sch_ecomm.tb_order_items a
+left join sch_ecomm.tb_product b on a.prd_id=b.prd_id
+group by 1 order by 2 desc
+
+-----------4.Calculate the total number of orders placed by each customer.---------------------
+select b.name,count(distinct a.order_id)as orderid from sch_ecomm.tb_orders a
+left join sch_ecomm.tb_customer b on a.email=b.email
+group by 1 order by 2 desc
+
+-----------------5.Find the category with the highest total sales amount.---------------------
+WITH sales_cat AS 
+(SELECT c.cat_id,c.cat_name,
+        SUM(a.total_amount) AS total_sales_amount
+    FROM sch_ecomm.tb_order_items a
+    JOIN sch_ecomm.tb_product b ON a.prd_id = b.prd_id
+    JOIN sch_ecomm.tb_categories c ON b.cat_id = c.cat_id
+    GROUP BY c.cat_id, c.cat_name
+),
+sales_max AS (
+    SELECT MAX(total_sales_amount) AS max_total_sales
+    FROM sales_cat
+		)
+SELECT
+    sc.cat_id,sc.cat_name,sc.total_sales_amount
+FROM sales_cat sc
+JOIN sales_max sm ON sc.total_sales_amount = sm.max_total_sales
+;
+
+-----------------6.Retrieve the list of products that are out of stock.------------
+select b.prd_id,b.prd_name,a.qty,a.status,a.last_updated
+from sch_ecomm.tb_invent a
+	JOIN sch_ecomm.tb_product b on a.prd_id=b.prd_id
+where status='out of stock' 
+
+
+------------7.Update the inventory quantity after an order is placed.--------------
+
+CREATE OR REPLACE FUNCTION update_invent()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE sch_ecomm.tb_invent
+    SET qty = qty - NEW.qty,
+        last_updated = CURRENT_TIMESTAMP,
+        status = CASE
+            WHEN qty - NEW.qty <= 0 THEN 'out of stock'
+            ELSE 'available'
+        END
+    WHERE prd_id = NEW.prd_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'prd_id % not found in inventory.', NEW.prd_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+/*****************************************************/
+CREATE TRIGGER order_insert
+AFTER INSERT ON sch_ecomm.tb_order_items
+FOR EACH ROW
+EXECUTE FUNCTION update_invent();
+
+-------BONUS-------
+-------1.Find the top 3 best-selling products by quantity sold.-----------
+select b.prd_name,sum(a.qty)as qty_sold
+	from sch_ecomm.tb_order_items a
+left join sch_ecomm.tb_product b on a.prd_id=b.prd_id
+group by 1 order by 2 desc limit 3
+
+
+--------2.Calculate the total revenue generated by each customer.------------
+select c.name,sum(a.total_amount)as revenue
+	from sch_ecomm.tb_order_items a
+left join sch_ecomm.tb_orders b on a.order_id=b.order_id
+left join sch_ecomm.tb_customer c on b.email=c.email
+group by 1 order by 2 desc
+
+
+-----3.Generate a monthly sales trend report for the current year, showing the total sales amount for each month.---
+select to_char(b.order_date,'yyyy-mm')as period,
+	sum(a.total_amount)as revenue
+	from sch_ecomm.tb_order_items a
+join sch_ecomm.tb_orders b on a.order_id=b.order_id 
+WHERE EXTRACT(YEAR FROM b.order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+group by 1 order by 1 desc
